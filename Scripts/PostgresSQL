@@ -1,0 +1,130 @@
+DROP TABLE IF EXISTS Speciality CASCADE;
+DROP TABLE IF EXISTS Faculty CASCADE;
+DROP TABLE IF EXISTS Student CASCADE;
+DROP TABLE IF EXISTS Administrator CASCADE;
+DROP TABLE IF EXISTS Event_ CASCADE;
+DROP TABLE IF EXISTS Semestr CASCADE;
+DROP TABLE IF EXISTS Course CASCADE;
+DROP TABLE  IF EXISTS Teacher CASCADE;
+DROP TABLE IF EXISTS Enrollment CASCADE;
+DROP TABLE IF EXISTS School_user CASCADE;
+DROP TABLE IF EXISTS Department CASCADE;
+
+
+CREATE TABLE School_user(
+	id BIGSERIAL PRIMARY KEY,
+	first_name text NOT NULL,
+	second_name text NOT NULL,
+	username text UNIQUE,
+	password text NOT NULL
+);
+CREATE TABLE Department(
+	id  BIGSERIAL PRIMARY KEY,
+	code text NOT NULL,
+	name text NOT NULL
+);
+CREATE TABLE Teacher(
+	
+	id_user bigint NOT NULL UNIQUE,
+	id_department bigint NOT NULL,
+	email text NOT NULL,
+	
+	CONSTRAINT from_department_fk_teacher
+	FOREIGN KEY (id_department) REFERENCES Department (id),
+	
+	CONSTRAINT User_fk  
+    FOREIGN KEY (id_user) REFERENCES School_user (id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE Course(
+	id BIGSERIAL PRIMARY KEY,
+	code text NOT NULL,
+	credits smallint,
+	id_department bigint NOT NULL,
+	
+	
+	CONSTRAINT from_department_fk_course
+	FOREIGN KEY (id_department) REFERENCES Department (id)
+	
+);
+
+
+CREATE TABLE Semestr(
+	id BIGSERIAL PRIMARY KEY,
+	half_year char, 
+	code text
+);
+
+CREATE TABLE Event_(
+	id BIGSERIAL PRIMARY KEY,
+	id_semestr bigint NOT NULL,
+	id_course bigint NOT NULL,
+	id_teacher bigint NOT NULL,
+	id_timestamp bigint NOT NULL,
+	room text,
+	time_ date,
+	
+	CONSTRAINT from_semestr_fk_event
+	FOREIGN KEY (id_semestr) REFERENCES Semestr (id),
+	CONSTRAINT from_course_fk_event
+	FOREIGN KEY (id_course) REFERENCES Course (id),
+	CONSTRAINT from_teacher_fk_event
+	FOREIGN KEY (id_teacher) REFERENCES teacher (id_user)
+	
+);
+
+CREATE TABLE Administrator(
+	id_user bigint NOT NULL,
+	
+	CONSTRAINT from_teacher_fk_administrator
+	FOREIGN KEY (id_user) REFERENCES school_user (id)
+);
+
+CREATE TABLE Faculty(
+	id BIGSERIAL PRIMARY KEY,
+	code text NOT NULL UNIQUE,
+	name text NOT NULL
+);
+
+CREATE TABLE Student(
+	id_user bigint NOT NULL UNIQUE,
+	email text NOT NULL,
+	id_faculty bigint NOT NULL,
+	
+	CONSTRAINT from_user_fk_user
+	FOREIGN KEY (id_user) REFERENCES School_user (id) ON DELETE CASCADE,
+	CONSTRAINT from_faculty_fk_administrator
+	FOREIGN KEY (id_faculty) REFERENCES faculty (id)
+);
+
+CREATE TABLE Speciality(
+	id BIGSERIAL PRIMARY KEY,
+	name text NOT NULL,
+	code text NOT NULL,
+	id_faculty bigint NOT NULL,
+	
+	CONSTRAINT from_faculty_fk_speciality
+	FOREIGN KEY (id_faculty) REFERENCES faculty (id)
+);
+
+
+
+CREATE TABLE Enrollment(
+	id BIGSERIAL PRIMARY KEY,
+	id_course bigint NOT NULL,
+	id_student bigint NOT NULL,
+	id_semestr bigint NOT NULL,
+	grade character,
+	
+	CONSTRAINT from_course_fk_enrollment
+	FOREIGN KEY (id_course) REFERENCES Course (id),
+	CONSTRAINT from_student_fk_enrollment
+	FOREIGN KEY (id_student) REFERENCES student (id_user),
+	CONSTRAINT from_semester_fk_enrollment
+	FOREIGN KEY (id_semestr) REFERENCES semestr (id)
+);
+
+	
+	
+	
